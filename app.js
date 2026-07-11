@@ -390,6 +390,8 @@
     var unlocked = isUnlocked();
     $("detail-lock").hidden = unlocked;
     $("detail-full").hidden = !unlocked;
+    var pb = $("pricing-unlock-btn");
+    if (pb && unlocked) { pb.textContent = "✓ Unlocked on this device"; pb.disabled = true; }
   }
   function openModal() { $("unlock-modal").hidden = false; }
   function closeModal() { $("unlock-modal").hidden = true; }
@@ -492,6 +494,8 @@
       $("postcode-input").focus();
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
+
+    applyLockState();
 
     // Deep link: ?pc=SW1A1AA
     var params = new URLSearchParams(location.search);
