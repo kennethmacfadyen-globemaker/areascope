@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kennethmacfadyen-globemaker.github.io/areascope/sitemap.xml

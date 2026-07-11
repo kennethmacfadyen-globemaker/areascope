@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AreaScope — instant UK area reports. Crime, amenities & flood risk for any postcode</title>
+<meta name="description" content="Type any UK postcode and get an instant area intelligence report: crime levels and trends, walkable amenities, transport, flood alerts and deprivation stats — built from official open data.">
+<link rel="canonical" href="https://kennethmacfadyen-globemaker.github.io/areascope/">
+<meta property="og:title" content="AreaScope — know the area before you commit">
+<meta property="og:description" content="Instant UK postcode reports: crime, amenities, transport, flood alerts. Free preview, full report £5.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kennethmacfadyen-globemaker.github.io/areascope/">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type":"Question","name":"Where does AreaScope data come from?","acceptedAnswer":{"@type":"Answer","text":"Official open sources: street-level crime from data.police.uk, geography and deprivation from postcodes.io (ONS), live flood alerts from the Environment Agency, and amenities from OpenStreetMap. Nothing is made up and nothing is stale — it is fetched live when you search."}},
+    {"@type":"Question","name":"Is the free report really free?","acceptedAnswer":{"@type":"Answer","text":"Yes. Every search shows the AreaScope Score and a headline for each category at no cost. The full report — trends, tables, distances and a printable PDF — is a one-time £5 unlock."}},
+    {"@type":"Question","name":"Does AreaScope cover Scotland and Northern Ireland?","acceptedAnswer":{"@type":"Answer","text":"Amenities, transport and area profile work UK-wide. Street-level crime covers England, Wales and Northern Ireland (Police Scotland and Greater Manchester Police do not publish to the open API; reports there say so explicitly). Flood alerts cover England."}},
+    {"@type":"Question","name":"Do you store my searches?","acceptedAnswer":{"@type":"Answer","text":"No. AreaScope has no server and no database. Your browser talks directly to the public data sources; your searches never pass through us."}}
+  ]
+}
+</script>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="brand" href="./">🌍 Area<span>Scope</span></a>
+  <nav>
+    <a href="#pricing">Pricing</a>
+    <a href="#faq">FAQ</a>
+    <a href="https://www.buymeacoffee.com/globemaker" target="_blank" rel="noopener" class="nav-cta">Support</a>
+  </nav>
+</header>
+
+<main>
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="top">
+    <h1>Know the area <em>before</em> you commit.</h1>
+    <p class="sub">Moving house? Choosing a rental, a B&amp;B, or a shop location? Type a UK postcode and get an instant area report — crime levels &amp; trends, walkable amenities, transport, flood alerts and more. Built live from official open data.</p>
+
+    <form id="search-form" class="search" autocomplete="off">
+      <div class="search-box">
+        <input id="postcode-input" type="text" inputmode="text" placeholder="Enter a UK postcode, e.g. M4 5BD" aria-label="UK postcode" required>
+        <button type="submit" id="search-btn">Get my report</button>
+      </div>
+      <ul id="autocomplete" class="autocomplete" hidden></ul>
+      <p class="reassure">Free instant preview · No sign-up · Searches never leave your browser</p>
+    </form>
+
+    <p class="trustline">Data: <strong>Police.uk</strong> · <strong>Environment Agency</strong> · <strong>ONS / postcodes.io</strong> · <strong>OpenStreetMap</strong></p>
+  </section>
+
+  <!-- ============ REPORT ============ -->
+  <section id="report" class="report" hidden>
+    <div id="report-status" class="report-status" hidden></div>
+    <div id="report-body" hidden>
+      <div class="report-head">
+        <div>
+          <h2 id="report-title">Area report</h2>
+          <p id="report-subtitle" class="muted"></p>
+        </div>
+        <div class="score-dial" id="score-dial"></div>
+      </div>
+
+      <div id="flood-banner" class="flood-banner" hidden></div>
+
+      <div class="cat-grid" id="cat-grid"></div>
+
+      <!-- Locked / unlocked detail -->
+      <div id="detail-lock" class="detail-lock">
+        <h3>The full report goes deeper</h3>
+        <ul class="lock-list">
+          <li>📈 6-month crime trend &amp; breakdown by offence type</li>
+          <li>🛒 Every amenity with its name and walking distance</li>
+          <li>🚉 Nearest station &amp; transport detail</li>
+          <li>🖨️ Printable / save-as-PDF report to share or file</li>
+        </ul>
+        <button class="btn-primary" id="unlock-btn">Unlock full reports — £5 one-time</button>
+        <p class="muted small">One payment unlocks every report on this device, forever.</p>
+      </div>
+
+      <div id="detail-full" class="detail-full" hidden>
+        <div class="detail-section" id="sec-crime"></div>
+        <div class="detail-section" id="sec-amenities"></div>
+        <div class="detail-section" id="sec-transport"></div>
+        <div class="detail-section" id="sec-environment"></div>
+        <div class="detail-section" id="sec-profile"></div>
+        <div class="report-actions">
+          <button class="btn-secondary" id="print-btn">🖨️ Print / save as PDF</button>
+          <button class="btn-secondary" id="new-search-btn">🔍 New search</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOW IT WORKS ============ -->
+  <section class="how" id="how">
+    <h2>One postcode. Four official sources. Ten seconds.</h2>
+    <div class="how-grid">
+      <div class="how-card"><span class="how-emoji">🚓</span><h3>Safety</h3><p>Street-level crime within a mile — how much, what kind, and whether it's rising or falling.</p></div>
+      <div class="how-card"><span class="how-emoji">🛒</span><h3>Daily life</h3><p>Supermarkets, GPs, pharmacies, schools, parks, cafés and pubs within walking distance.</p></div>
+      <div class="how-card"><span class="how-emoji">🚉</span><h3>Getting around</h3><p>Nearest railway station and bus stops — can you live there without a car?</p></div>
+      <div class="how-card"><span class="how-emoji">🌊</span><h3>Environment</h3><p>Live Environment Agency flood alerts near the postcode, plus the area's official deprivation ranking.</p></div>
+    </div>
+    <p class="how-note">Reports are generated live in your browser from public APIs — never cached, never out of date, never tracked.</p>
+  </section>
+
+  <!-- ============ WHO IT'S FOR ============ -->
+  <section class="who">
+    <h2>Made for decisions that are expensive to get wrong</h2>
+    <div class="who-grid">
+      <div class="who-card"><h3>🏠 Movers &amp; renters</h3><p>You'll spend hours on Rightmove photos. Spend ten seconds checking what the photos don't show.</p></div>
+      <div class="who-card"><h3>🔑 Landlords &amp; hosts</h3><p>Screen a street before you buy or list. Compare postcodes side by side before committing capital.</p></div>
+      <div class="who-card"><h3>🏪 Small businesses</h3><p>Footfall follows amenities and transport. Check a unit's surroundings before signing the lease.</p></div>
+    </div>
+  </section>
+
+  <!-- ============ PRICING ============ -->
+  <section class="pricing" id="pricing">
+    <h2>Pricing</h2>
+    <div class="price-grid">
+      <div class="price-card">
+        <h3>Preview</h3>
+        <p class="price">£0</p>
+        <ul>
+          <li>✅ AreaScope Score (0–100)</li>
+          <li>✅ Safety, amenities, transport &amp; environment headlines</li>
+          <li>✅ Live flood alerts</li>
+          <li>✅ Unlimited searches</li>
+        </ul>
+        <a class="btn-secondary" href="#top">Try it now</a>
+      </div>
+      <div class="price-card featured">
+        <div class="badge">Most popular</div>
+        <h3>Full reports</h3>
+        <p class="price">£5 <span>one-time</span></p>
+        <ul>
+          <li>✅ Everything in Preview</li>
+          <li>✅ 6-month crime trend &amp; offence breakdown</li>
+          <li>✅ Every amenity, named, with walking distance</li>
+          <li>✅ Printable / PDF reports</li>
+          <li>✅ All reports on this device, forever</li>
+        </ul>
+        <button class="btn-primary" id="pricing-unlock-btn">Unlock for £5</button>
+        <p class="muted small">Pay securely via Buy Me a Coffee. Can't afford it? <a href="https://docs.google.com/forms/d/e/1FAIpQLSe-93kY-jagA7ZB-U9bLWbA0I6XwmINco6NWrNfkGln5kHT_w/viewform?usp=dialog" target="_blank" rel="noopener">Tell me</a> and I'll unlock you anyway.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="faq" id="faq">
+    <h2>Questions people ask</h2>
+    <details><summary>Where does the data come from?</summary><p>Four official/open sources, fetched live at the moment you search: street-level crime from <strong>data.police.uk</strong>, geography and deprivation statistics from <strong>postcodes.io</strong> (ONS data), live flood alerts from the <strong>Environment Agency</strong>, and amenities from <strong>OpenStreetMap</strong>. The report shows exactly what the public record shows — nothing is edited or embellished.</p></details>
+    <details><summary>Does it cover the whole UK?</summary><p>Amenities, transport and the area profile work UK-wide. Street-level crime covers England, Wales and Northern Ireland — Police Scotland and Greater Manchester Police don't publish to the open API, so in those areas the score is calculated without the crime component and the report tells you exactly that. We'd rather show you a gap than a made-up number. Flood alerts cover England.</p></details>
+    <details><summary>How accurate is the crime data?</summary><p>It's the same data the police publish, anonymised to street level, usually 1–2 months behind today. It counts <em>reported</em> crime within roughly one mile of the postcode. Treat it as a strong signal, not a verdict — always visit an area in person too.</p></details>
+    <details><summary>Do you store my searches or email?</summary><p>No. There's no server, no database, no cookies, no analytics. Your browser talks directly to the public APIs. The £5 unlock is stored only on your own device.</p></details>
+    <details><summary>How does the £5 unlock work?</summary><p>Payment goes through Buy Me a Coffee (card / Apple Pay / Google Pay). After paying, you press "I've paid — unlock" and full reports open on your device permanently. It's an honour system — AreaScope is a one-person product and I'd rather trust you than make you create an account.</p></details>
+    <details><summary>Can I use a report in a dispute / with my landlord / for a mortgage?</summary><p>Reports are for guidance only. They summarise public data accurately but aren't professional advice or an official document.</p></details>
+  </section>
+
+  <!-- ============ FINAL CTA ============ -->
+  <section class="final-cta">
+    <h2>The photos show the kitchen.<br>AreaScope shows the street.</h2>
+    <a class="btn-primary big" href="#top">Check a postcode — free</a>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <p class="small"><strong>City guides:</strong>
+    <a href="cities/london.html">London</a> · <a href="cities/birmingham.html">Birmingham</a> ·
+    <a href="cities/leeds.html">Leeds</a> · <a href="cities/liverpool.html">Liverpool</a> ·
+    <a href="cities/bristol.html">Bristol</a> · <a href="cities/sheffield.html">Sheffield</a> ·
+    <a href="cities/newcastle.html">Newcastle</a> · <a href="cities/nottingham.html">Nottingham</a> ·
+    <a href="cities/leicester.html">Leicester</a> · <a href="cities/southampton.html">Southampton</a> ·
+    <a href="cities/cardiff.html">Cardiff</a> · <a href="cities/brighton.html">Brighton</a></p>
+  <p><strong>AreaScope</strong> — an independent tool by <a href="https://kennethmacfadyen-globemaker.github.io/" target="_blank" rel="noopener">Kenneth (globemaker)</a>.
+  <a href="https://docs.google.com/forms/d/e/1FAIpQLSe-93kY-jagA7ZB-U9bLWbA0I6XwmINco6NWrNfkGln5kHT_w/viewform?usp=dialog" target="_blank" rel="noopener">Send feedback</a> ·
+  <a href="https://www.buymeacoffee.com/globemaker" target="_blank" rel="noopener">Buy me a coffee</a></p>
+  <p class="small muted">Contains public sector information licensed under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank" rel="noopener">Open Government Licence v3.0</a> (data.police.uk, Environment Agency, ONS). Amenity data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>, ODbL. Reports are guidance, not professional advice.</p>
+</footer>
+
+<!-- ============ UNLOCK MODAL ============ -->
+<div class="modal-backdrop" id="unlock-modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <button class="modal-close" id="modal-close" aria-label="Close">×</button>
+    <h3 id="modal-title">Unlock full reports — £5, once</h3>
+    <p>Every full report on this device, forever: crime trends, offence breakdowns, named amenities with distances, and printable PDFs.</p>
+    <ol class="modal-steps">
+      <li>Chip in £5 via Buy Me a Coffee (opens in a new tab)</li>
+      <li>Come back and press unlock</li>
+    </ol>
+    <a class="btn-primary" id="pay-link" href="https://www.buymeacoffee.com/globemaker" target="_blank" rel="noopener">1 · Chip in £5 →</a>
+    <button class="btn-secondary" id="confirm-unlock">2 · I've paid — unlock</button>
+    <p class="muted small">Honour system — no accounts, no tracking. Already paid on another device? The same button works.</p>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
